@@ -1,39 +1,59 @@
-export default function Cadrastro() {
-    const [nome, setNome] = useState('');
-    const [seha, setSenha] = useState('');
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { cadastrarUsuario } from '../database/database';
 
-async function carregar() {
-    const valor = await asyncStorage.getItem('nm_user');
-    if (valor) setNome(valor)
-}
+export default function Cadastro() {
+  const [nome, setNome] = useState('');
+  const [senha, setSenha] = useState('');
 
-useEffect(() => {
-    conectarBd();
-    Carregar();
-}, []);
+  const router = useRouter();
 
-function cadrastar() {
+  async function cadastrar() {
     if (!nome || !senha) {
-        alert('Prencha todos os campos');
-        return;
+      Alert.alert('Erro', 'Preencha todos os campos');
+      return;
     }
-    const sucesso = cadastarUsuario(nome, senha);
-    if (sucesso) {
-        AsyncStrorage.getItem('nm_user', nome);
-        alert('senha cadrastrada com sucesso!');
-        Router.replace('/home');
-    } else {
-        alert('erro ao cadrastar usuario');
-    }
-}
-    return (
-        <Text>
-            cadrastar senha
-        </Text>
 
-        <TextInput
-        placehoder="Nome"
+    const sucesso = cadastrarUsuario(nome, senha);
+
+    if (sucesso) {
+      await AsyncStorage.setItem('nm_user', nome);
+
+      Alert.alert('Sucesso', 'Usuário cadastrado!');
+
+      router.replace('/produto');
+    } else {
+      Alert.alert('Erro', 'Usuário já existe');
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Cadastro</Text>
+
+      <TextInput
+        placeholder="Nome"
         value={nome}
+        onChangeText={setNome}
+        style={styles.input}
+      />
+
+      <TextInput
+        placeholder="Senha"
+        value={senha}
+        onChangeText={setSenha}
+        secureTextEntry
+});
+
         editable={false}
         />
 
