@@ -1,40 +1,77 @@
-<Text style={StyleSheet.clunasProduto}>
-    {item.nome} - r$ {Item.preco}
-</Text>
+import { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 
-<touchableOpacity
-onPress=(() =>editar(item))
-/>touchableOpacity
+import {
+  conectarBD,
+  exibirProdutos,
+  adicionarProduto,
+  editarProduto,
+  excluirProduto,
+} from '../database/database';
 
-<textInput
-placehoder="nome"
-value={nome}
-onChageText={setNome}
-/>
-<textInput
-placehoder="preco"
-value={preco}
-onChangeText={setPreco}
-keyboardType="numeric"
-/>
-<touchableOpacity onPress={salvar}>
-    <Text>
-        {editandoId !== null ? 'atualizar' :
-        'Adicionar'}
-        adiconar
-    </Text>
-</touchableOpacity>
+export default function Produto() {
+  const [produtos, setProdutos] = useState<any[]>([]);
+  const [nome, setNome] = useState('');
+  const [preco, setPreco] = useState('');
+  const [editandoId, setEditandoId] = useState<number | null>(null);
 
-const [nome, setNome] = useState('');
-const [preco, setPreco] = useState('');
-
-const [editandoId, setEditandoId] = useState<number | null>(null);
-useStata<number | null>(null);
-
-useEffect(() => {
+  useEffect(() => {
     conectarBD();
-    carregarProdutos
-}
+    carregarProdutos();
+  }, []);
+
+  function carregarProdutos() {
+    const lista = exibirProdutos();
+    setProdutos(lista);
+  }
+
+  function salvar() {
+    if (!nome || !preco) {
+      Alert.alert('Erro', 'Preencha todos os campos');
+      return;
+    }
+
+    if (editandoId !== null) {
+      editarProduto(editandoId, nome, parseFloat(preco));
+      setEditandoId(null);
+    } else {
+      adicionarProduto(nome, parseFloat(preco));
+    }
+
+    setNome('');
+    setPreco('');
+
+    carregarProdutos();
+  }
+
+  function editar(item: any) {
+    setNome(item.nome);
+    setPreco(String(item.preco));
+    setEditandoId(item.id);
+  }
+
+  function deletar(id: number) {
+    excluirProduto(id);
+    carregarProdutos();
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Produtos</Text>
+
+      <TextInput
+        placeholder="Nome"
+        value={nome}
+        onChangeText={setNome}
+});}
 function editar(item: any) {
     setNome(item.nome);
     setPreco(String(item.preco));
